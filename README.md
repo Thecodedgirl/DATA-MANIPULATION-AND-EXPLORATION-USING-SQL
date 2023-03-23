@@ -5,3 +5,4 @@ Create a database on desired project topic with tables and the following:
 2. Query with sub queries 
 3. Stored Functions
 4. Views 
+5. EER Diagram
