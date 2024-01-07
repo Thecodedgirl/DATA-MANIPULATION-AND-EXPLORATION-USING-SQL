@@ -1,3 +1,4 @@
+#CREATE DATABASE 
 CREATE DATABASE cake_shop;
 USE cake_shop;
 CREATE table employee(
@@ -114,15 +115,15 @@ VALUES
 (3,'4b',3),
 (4,'2b',2);
 
--- Creating query to know the numbers of customers within Bolton
+#QUERYING DATABASE
+-- a query to know the numbers of customers within Bolton
 SELECT customer_id,
 street,
 city,
 postcode
 FROM customer_address
 WHERE city ='Bolton';
-
--- creating query to know highest order 
+-- a query to know highest order 
 SELECT o.order_id,c.customer_id,ca.cake_size,ca.price
 FROM orders o
 INNER JOIN customers_orders c 
@@ -131,9 +132,16 @@ INNER JOIN cake ca
 ON ca.cake_id = o.cake_id
 GROUP BY price
 ORDER BY price DESC;
-
+--  a sub query to extract customers with city not stated  
+SELECT customers_orders_id,
+order_id,
+customer_id
+FROM customers_orders
+WHERE customer_id =(
+SELECT customer_id
+FROM customer_address
+WHERE city IS NULL);
 -- creating view with joins of different tables 
-
 -- join view 1: joining customer and customer_address tables to show customers address and contact details
 CREATE VIEW customers_details
 AS 
@@ -148,8 +156,7 @@ FROM customers c
 JOIN customer_address cu
 ON 
 c.customers_id = cu.customer_id;
-
--- join view 2: joining the cake table and customers_orders table to show the orderd cake details
+-- join view 2: joining the cake table and customers_orders table to show the ordered cake details
 CREATE VIEW cake_details
 AS
 SELECT o.order_id,
@@ -162,7 +169,6 @@ INNER JOIN cake ca
 ON o.cake_id = ca.cake_id
 INNER JOIN  customers_orders co
 ON o.order_id = co.order_id;
-
 -- Creating a stored function to determine if a customer is eligible for discount
 DELIMITER //
 CREATE FUNCTION discount_eligible(price INT)
@@ -178,7 +184,7 @@ SET discount_eligible ="No";
 END IF;
 RETURN (discount_eligible);
 END //
-
+	
 DELIMITER ;
 
 -- using the created stored function with a view to determine eligible customers for discount using HAVING
@@ -188,17 +194,6 @@ price,
 discount_eligible(price) as discount
 FROM cake_details
 HAVING discount = 'YES';
-
--- an example query with a sub query to extract 
-SELECT customers_orders_id,
-order_id,
-customer_id
-FROM customers_orders
-WHERE customer_id =(
-SELECT city
-FROM customer_address
-WHERE customer_id IS NULL);
-
 
 -- a view that uses 3 tables
 CREATE VIEW orders_full_detail
@@ -263,13 +258,6 @@ END //
 DELIMITER ;
 
 
-SELECT order_id,
-cake_size,
-price,
-discount_eligible(price) as discount,
-discount_amount(price) as discount_amount
-FROM cake_details
-HAVING discount = 'YES';
 
 
 
